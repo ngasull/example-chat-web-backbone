@@ -40,7 +40,7 @@ gulp.task('static', function () {
 
 gulp.task('watchify', function () {
 
-    var entry = './src/web/chat-backbone.js',
+    var entry = './src/web/chat-backbone.jsx',
         props = {
             cache: {},
             packageCache: {},
