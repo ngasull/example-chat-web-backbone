@@ -27,10 +27,11 @@ export default class UsernameInput extends React.Component {
         e.preventDefault()
 
         if (this.props.user.get('name').length)
-            console.log('User set up')
+            this.props.onSetup()
     }
 }
 
 UsernameInput.propTypes = {
-    user: React.PropTypes.instanceOf(User)
+    user: React.PropTypes.instanceOf(User),
+    onSetup: React.PropTypes.func
 }
