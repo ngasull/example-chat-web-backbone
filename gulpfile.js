@@ -11,14 +11,19 @@ var watchify = require('watchify')
 var source = require('vinyl-source-stream')
 var buffer = require('vinyl-buffer')
 var gutil = require('gulp-util')
+var stylus = require('gulp-stylus')
+var postcss = require('gulp-postcss')
+var sourcemaps = require('gulp-sourcemaps')
+var autoprefixer = require('autoprefixer-core')
 
 var paths = {
-    transpile: ['src/server/**'],
+    transpile: ['src/server/**/*.js'],
+    css: ['src/web/css/chat-backbone.styl'],
     static: ['src/web/index.html', 'src/web/static/**']
 }
 
 gulp.task('transpile', function () {
-    gulp
+    return gulp
         .src(paths.transpile, {
             base: 'src'
         })
@@ -29,8 +34,21 @@ gulp.task('transpile', function () {
         .pipe(gulp.dest('dist'))
 })
 
+gulp.task('css', function () {
+    return gulp
+        .src(paths.css, {
+            base: 'src/web'
+        })
+        .pipe(sourcemaps.init())
+        .pipe(stylus())
+        .pipe(postcss([autoprefixer({browsers: ['last 2 version']})]))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('dist/web/static'))
+        .pipe(livereload())
+})
+
 gulp.task('static', function () {
-    gulp
+    return gulp
         .src(paths.static, {
             base: 'src'
         })
@@ -76,9 +94,14 @@ gulp.task('clean', function () {
     del.sync('dist')
 })
 
-gulp.task('default', ['transpile', 'static', 'watchify'], function () {
+gulp.task('default', ['transpile', 'css', 'static', 'watchify'], function () {
+
+    livereload({
+        start: true
+    })
 
     gulp.watch(paths.transpile, ['transpile'])
+    gulp.watch(paths.css, ['css'])
     gulp.watch(paths.static, ['static'])
 
     require('./dist/server')

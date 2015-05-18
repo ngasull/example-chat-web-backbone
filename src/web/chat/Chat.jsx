@@ -11,6 +11,7 @@ export default class Chat extends React.Component {
 
     constructor() {
         super()
+
         this.onMessageChange = this.onMessageChange.bind(this)
         this.onMessageSent = this.onMessageSent.bind(this)
 
@@ -22,10 +23,16 @@ export default class Chat extends React.Component {
     componentWillMount() {
         this.props.messages.fetch()
         this.props.messages.on('reset add change remove', () => this.forceUpdate())
+
+        this.props.socket.on('message', (message) => {
+            console.log('Message received', message)
+            this.props.messages.add([new Message(message)])
+        })
     }
 
     componentWillUnmount() {
         this.props.messages.off('reset add change remove')
+        this.props.messages.off('message')
     }
 
     render() {
@@ -35,9 +42,13 @@ export default class Chat extends React.Component {
             <ChatMessage key={message.get('id')} message={message}/>)
 
         return (
-            <form onSubmit={this.onMessageSent}>
+            <form className="chat" onSubmit={this.onMessageSent}>
                 <h1>Welcome {username}</h1>
-                <ul>{messageElements}</ul>
+                <ul>
+                    <li>&nbsp;</li>
+                    {messageElements}
+                    <li>&nbsp;</li>
+                </ul>
                 <input type="text" value={this.state.userMessage} onChange={this.onMessageChange}/>
             </form>)
     }
@@ -53,10 +64,11 @@ export default class Chat extends React.Component {
         let text = this.state.userMessage
 
         if (text.length) {
-            this.props.messages.add([new Message({
+
+            this.props.messages.create({
                 author: this.props.user.get('name'),
                 text: text
-            })])
+            })
 
             this.setState({
                 userMessage: ''
@@ -66,6 +78,7 @@ export default class Chat extends React.Component {
 }
 
 Chat.propTypes = {
+    socket: React.PropTypes.any,
     user: React.PropTypes.instanceOf(User),
     messages: React.PropTypes.instanceOf(Messages)
 }

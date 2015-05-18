@@ -1,0 +1,36 @@
+.chat
+  flexColumn()
+  flex-grow 1
+  overflow hidden
+
+  h1
+    margin 0
+    padding 0
+    background #272822
+    color #eeeeee
+    font-style italic
+
+  ul
+    flex-grow 1
+    padding 0 10
+    margin 0
+    overflow auto
+    background #272822
+    color #eeeeee
+    font-family Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, "Courier New", monospace
+
+    li
+      flexRow()
+      list-style-type none
+      line-height 1.12em
+
+      .author
+        flex-basis 10em
+        overflow hidden
+        font-weight bold
+
+      .text
+        flex-grow 1
+
+  input
+    line-height 1.8

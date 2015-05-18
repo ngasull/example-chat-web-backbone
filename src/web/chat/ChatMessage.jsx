@@ -7,7 +7,11 @@ let Message = require('../model/Message.js')
 export default class ChatMessage extends React.Component {
 
     render() {
-        return <li>{this.props.message.get('author')}: {this.props.message.get('text')}</li>
+        return (
+            <li>
+                <span className="author">{this.props.message.get('author')}</span>
+                <span className="text">{this.props.message.get('text')}</span>
+            </li>)
     }
 }
 
