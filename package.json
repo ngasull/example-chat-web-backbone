@@ -1,8 +1,11 @@
 {
   "name": "example-chat-web-backbone",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backbone implementation of a chat using example-chat-backend project",
-  "main": "dist/server/index.js",
+  "main": "server/index.js",
+  "scripts": {
+    "test": "node server/index.js"
+  },
   "dependencies": {
     "example-chat-backend": "^1.0.0",
     "express": "^4.12.3"
@@ -31,9 +34,6 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.2.1"
-  },
-  "scripts": {
-    "test": "gulp test"
   },
   "repository": {
     "type": "git",
