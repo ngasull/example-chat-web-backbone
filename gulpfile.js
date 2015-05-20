@@ -1,6 +1,8 @@
 'use strict';
 
+var fs = require('fs')
 var gulp = require('gulp')
+var npm = require('npm')
 var del = require('del')
 var eslint = require('gulp-eslint')
 var changed = require('gulp-changed')
@@ -20,6 +22,45 @@ var paths = {
     transpile: ['src/server/**/*.js'],
     css: ['src/web/css/chat-backbone.styl'],
     static: ['src/web/index.html', 'src/web/static/**']
+}
+
+function doBrowserify(watch) {
+
+    var bundler,
+        entry = './src/web/chat-backbone.jsx',
+        props = {
+            cache: {},
+            packageCache: {},
+            debug: true
+        }
+
+    function bundle() {
+        return bundler.bundle()
+            .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+            .pipe(source('chat-backbone.js'))
+            .pipe(buffer())
+            .pipe(gulp.dest('dist/web/static'))
+    }
+
+    bundler = browserify(entry, props)
+        .transform('babelify', {
+            sourceMaps: true
+        })
+
+    if (watch) {
+        bundler = watchify(bundler)
+
+        bundler.on('update', bundle)
+        bundler.on('bytes', function () {
+            livereload.reload()
+        })
+    }
+
+
+    bundler.on('log', gutil.log)
+    bundler.on('error', gutil.log)
+
+    return bundle()
 }
 
 gulp.task('transpile', function () {
@@ -56,42 +97,36 @@ gulp.task('static', function () {
         .pipe(livereload())
 })
 
+gulp.task('browserify', function () {
+    return doBrowserify(false)
+})
+
 gulp.task('watchify', function () {
-
-    var entry = './src/web/chat-backbone.jsx',
-        props = {
-            cache: {},
-            packageCache: {},
-            debug: true
-        }
-
-    var bundler = watchify(browserify(entry, props)
-        .transform('babelify', {
-            sourceMaps: true
-        }))
-
-    function bundle() {
-        return bundler.bundle()
-            .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-            .pipe(source('chat-backbone.js'))
-            .pipe(buffer())
-            .pipe(gulp.dest('dist/web/static'))
-    }
-
-    bundler.on('update', bundle)
-
-    bundler.on('bytes', function () {
-        livereload.reload()
-    })
-
-    bundler.on('log', gutil.log)
-    bundler.on('error', gutil.log)
-
-    return bundle()
+    return doBrowserify(true)
 })
 
 gulp.task('clean', function () {
     del.sync('dist')
+})
+
+gulp.task('package-static', function () {
+    return gulp.src(['package.json', 'README.md', 'LICENSE'])
+        .pipe(gulp.dest('dist'))
+})
+
+gulp.task('package.json', ['package-static'], function (done) {
+    var pkg = require('./package.json')
+
+    // Get the version and increment the last element
+    var versionMatch = pkg.version.match(/^(.+\.)(\d+)$/)
+    pkg.version = versionMatch[1] + (parseInt(versionMatch[2]) + 1)
+
+    // Overwrite to the version incremented package.json
+    fs.writeFile('./package.json', new Buffer(JSON.stringify(pkg, null, '  ')), done)
+})
+
+gulp.task('publish', ['transpile', 'css', 'static', 'browserify', 'package.json'], function (done) {
+    npm.commands.publish(['dist'], done)
 })
 
 gulp.task('default', ['transpile', 'css', 'static', 'watchify'], function () {
