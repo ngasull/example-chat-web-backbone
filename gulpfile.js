@@ -125,8 +125,12 @@ gulp.task('package.json', ['package-static'], function (done) {
     fs.writeFile('./package.json', new Buffer(JSON.stringify(pkg, null, '  ')), done)
 })
 
-gulp.task('publish', ['transpile', 'css', 'static', 'browserify', 'package.json'], function (done) {
-    npm.commands.publish(['dist'], done)
+gulp.task('package', ['transpile', 'css', 'static', 'browserify', 'package-static'])
+
+gulp.task('publish', ['package', 'package.json'], function (done) {
+    npm.load(function () {
+        npm.commands.publish(['dist'], done)
+    })
 })
 
 gulp.task('default', ['transpile', 'css', 'static', 'watchify'], function () {
