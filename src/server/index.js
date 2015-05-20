@@ -2,6 +2,7 @@ let path = require('path')
 let express = require('express')
 let ChatBackend = require('example-chat-backend')
 
+let PORT = 3000
 let backend = new ChatBackend()
 
 backend.setupApiRoutes()
@@ -11,4 +12,5 @@ backend.app.use('/', function (req, res) {
     res.sendFile(path.join(__dirname, '../web/index.html'))
 })
 
-backend.listen(3000)
+backend.listen(PORT)
+console.log(`Listening at http://localhost:${PORT}`)
