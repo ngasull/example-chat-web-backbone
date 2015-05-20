@@ -1,6 +1,6 @@
 {
   "name": "example-chat-web-backbone",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Backbone implementation of a chat using example-chat-backend project",
   "main": "server/index.js",
   "scripts": {
