@@ -3,7 +3,7 @@ Backbone implementation of a chat using example-chat-backend project.
 
 ## How to use
     npm install example-chat-web-backbone
-    npm start example-chat-web-backbone
+    node node_modules/example-chat-web-backbone/server/index.js
 
 ## Technologies used
 * Backbone
